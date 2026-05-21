@@ -1,0 +1,18 @@
+# Generated reports and assets
+*.html
+*.zip
+*.json
+report_assets/
+baguette_report_assets/
+browser_screenshots/
+
+# Secrets/config
+.env
+config.yaml
+*.key
+*.pem
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
