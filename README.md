@@ -23,6 +23,8 @@ hermes-ecommerce-skills/
 ├── README.md
 ├── bundles/
 │   └── product-research.yaml
+├── scripts/
+│   └── install-product-research.sh
 └── ecommerce/
     └── amazon-product-research-assistant/
         ├── SKILL.md
@@ -32,6 +34,27 @@ hermes-ecommerce-skills/
             ├── html-report-template-notes.md
             └── product-research-bundle-notes.md
 ```
+
+## 仓库维护边界
+
+本仓库只维护**电商专属内容**：
+
+- `amazon-product-research-assistant` 核心选品 Skill
+- `/product-research` Bundle 配置
+- 电商选品报告、竞品分析、评论洞察、利润/合规/IP 风险相关 references
+- 安装脚本和中文使用文档
+
+本仓库**不复制、不维护** Hermes 通用 Skill：
+
+- `subagent-driven-development`
+- `youtube-content`
+- `html-artifact-generation`
+
+这些通用 Skill 应由用户自己的 Hermes 环境或 Hermes 上游提供。这样可以避免通用 Skill 分叉后过时，也让本仓库保持清晰：这里只维护电商选品逻辑。
+
+如果通用 Skill 本身有 bug，例如 YouTube transcript 脚本坏了、HTML artifact 生成器本身有问题，请优先向 Hermes 上游提交 Issue/PR。
+
+如果问题是 `/product-research` **如何调用这些通用 Skill**，例如 YouTube 分析不够明确、HTML 报告结构不适合选品、多 agent 分工不清楚，请向本仓库提交 Issue/PR。
 
 ## 先理解：Skill 和 Bundle 有什么区别？
 
@@ -266,7 +289,28 @@ HTML 报告应包含：
 - 下一步验证清单
 - 数据来源与缺失数据说明
 
-## 安装 Skill
+## 一键安装（推荐）
+
+如果你只是想直接使用 `/product-research`，推荐用安装脚本：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/flying864/hermes-ecommerce-skills/main/scripts/install-product-research.sh | bash
+```
+
+安装到指定 Hermes profile：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/flying864/hermes-ecommerce-skills/main/scripts/install-product-research.sh | bash -s -- --profile xiaosun
+```
+
+脚本会做两件事：
+
+1. 安装本仓库维护的核心电商 Skill：`amazon-product-research-assistant`
+2. 下载 `/product-research` Bundle 到对应 profile 的 `skill-bundles/` 目录
+
+脚本不会复制 Hermes 通用 Skill；如果你的环境缺少 `subagent-driven-development`、`youtube-content` 或 `html-artifact-generation`，请用 Hermes 自带的 skills search/install 能力安装，或参考 Hermes 官方文档。
+
+## 手动安装 Skill
 
 安装核心 Skill：
 
@@ -286,7 +330,7 @@ hermes -s amazon-product-research-assistant
 /skill amazon-product-research-assistant
 ```
 
-## 安装 `/product-research` Bundle
+## 手动安装 `/product-research` Bundle
 
 ### 默认 Hermes profile
 
@@ -453,6 +497,30 @@ Generated report file if safe to share:
 - 报告太浅、太长、缺少关键章节
 - 把估算数据写成了事实
 - Amazon / Google Trends / YouTube / TikTok 流程过时
+
+### 依赖通用 Skill 有问题时怎么办？
+
+`/product-research` 依赖 3 个 Hermes 通用 Skill：
+
+- `subagent-driven-development`
+- `youtube-content`
+- `html-artifact-generation`
+
+这些 Skill **不在本仓库维护**。
+
+请按下面规则提交反馈：
+
+- 如果问题是通用 Skill 本身坏了：例如 YouTube transcript 脚本报错、HTML artifact 生成器本身有 bug、多 agent 框架本身异常，请优先去 Hermes 上游提交 Issue/PR。
+- 如果问题是本仓库**如何使用**这些通用 Skill：例如 `/product-research` 没有明确要求 YouTube 视频分析、HTML 报告结构不适合选品、多 agent 分工不清楚、缺少 fallback 规则，请在本仓库提交 Issue/PR。
+
+本仓库欢迎修改：
+
+- `bundles/product-research.yaml` 的 instruction
+- `ecommerce/amazon-product-research-assistant/SKILL.md` 的选品流程
+- `references/*.md` 的集成说明、报告模板、fallback 规则
+- `README.md` 和 `scripts/install-product-research.sh`
+
+本仓库不接受把通用 Skill 整份复制进来作为长期维护对象，除非有明确的电商专属 fork 理由。
 
 ### 欢迎 PR 改进
 
