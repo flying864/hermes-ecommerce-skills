@@ -228,7 +228,7 @@ timed pet feeder
 
 ### Batch 3：内容平台与综合判断
 
-- **YouTube Agent**：分析相关视频、标题、播放量、评论痛点、购买动机和内容角度
+- **YouTube Video Analysis Agent**：必须搜索 YouTube 相关视频（测评、开箱、教程、Top list、problem-solution、before/after、gift idea 等），分析标题、播放量、发布时间、频道类型、视频描述、评论痛点、购买动机和可传播内容角度；可用时必须使用 `youtube-content` 抓取 transcript，不可用时明确标注“字幕/评论数据缺失”。
 - **TikTok/Social Agent**：分析短视频传播性、内容形式、评论购买意图；无法访问时标注缺口
 - **Opportunity Synthesis Agent**：汇总所有结果，给出 100 分评分、推荐等级、进入/放弃理由和下一步验证计划
 
