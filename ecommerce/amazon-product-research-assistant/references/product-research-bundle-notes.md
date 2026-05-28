@@ -1,0 +1,59 @@
+# Product Research Bundle Pattern
+
+Use this reference when turning the Amazon product research workflow into a user-facing slash bundle such as `/product-research`.
+
+## Recommended bundle
+
+```yaml
+name: product-research
+description: 亚马逊/跨境电商选品调研：多 agent 分工分析关键词、竞品、趋势、评论、内容平台、利润和风险，默认输出 HTML 报告
+skills:
+- amazon-product-research-assistant
+- subagent-driven-development
+- youtube-content
+- html-artifact-generation
+instruction: |
+  用户给出产品关键词、中文品类、英文关键词、ASIN 或 Amazon 链接后，执行亚马逊/跨境电商选品调研。
+
+  默认假设：目标站点 amazon.com，目标市场美国，适合小团队轻资产模式；如用户提供站点、预算、售价区间或 API/CSV 数据，则优先使用用户信息。
+
+  必须优先使用多 agent 分工执行，不要单 agent 直接脑补完整报告。推荐使用 delegate_task batch 模式，每批最多 3 个 agent；如果当前环境没有 delegation 工具或子 agent 失败，则用可用工具分步补齐，并在报告里明确标注缺口。
+
+  Batch 1：市场与趋势
+  1. Amazon Competition Agent：分析 Amazon 搜索结果、价格带、评分/评论数、评论护城河、广告密度、品牌集中度、Listing 质量。
+  2. Google Trends Agent：分析 5 年、12 个月、90 天趋势、地区热度、相关查询和同义关键词。
+  3. Third-Party/API Agent：如用户提供 API/CSV/插件数据则解析；没有则明确标注缺失，不编造销量/搜索量。
+
+  Batch 2：评论、竞品、利润风险
+  1. Review Intelligence Agent：分析好评卖点和 1-3 星差评痛点，提炼可改良方向。
+  2. Competitor Strategy Agent：分析 5-10 个主要竞品、弱竞品、差异化空间、图片/标题/A+ 页面机会。
+  3. Profit/Risk Agent：估算售价、成本、FBA/Referral fee、广告 ACOS、退货率、供应链、合规/IP/认证风险。
+
+  Batch 3：内容平台与综合判断
+  1. YouTube Agent：分析相关视频、标题、播放量、评论痛点、购买动机和内容角度；可用时抓取 transcript。
+  2. TikTok/Social Agent：分析短视频传播性、内容形式、评论购买意图；无法访问时标注缺口。
+  3. Opportunity Synthesis Agent：汇总所有结果，给出 100 分评分、推荐等级、进入/放弃理由和下一步验证计划。
+
+  最终输出要求：
+  1. 默认生成美观 HTML 报告附件，不要在聊天里发长篇全文。
+  2. 聊天内只给：推荐等级、总分、核心判断、下一步建议和附件。
+  3. 必须区分：公开网页观察、估算、假设、第三方数据、缺失数据。
+  4. 不要夸大机会；如果不适合做，要明确说“不建议”。
+  5. 报告必须包含：结论先行、Amazon 竞争、Google Trends、评论洞察、竞品分析、YouTube/TikTok、利润与风险、差异化方案、下一步验证清单。
+  6. 如果生成 HTML/ZIP，先确认文件存在和大小，再用 MEDIA:/absolute/path 发送。
+```
+
+## Usage examples
+
+```text
+/product-research garlic press
+/product-research 宠物除毛刷，目标美国站，重点看差评痛点和利润
+/product-research https://www.amazon.com/dp/B0XXXXXXX 深度分析这个 ASIN 是否值得做
+```
+
+## Execution notes from validation
+
+- Bundle invocation successfully loads the selected skills and passes the remaining text as `User instruction`.
+- The bundle does not itself create subagents; the skill instruction must explicitly require `delegate_task` batch execution.
+- If one child lane fails because of provider/API issues, continue with completed lanes, refill the gap with direct tools if available, and mark the missing lane in the final report instead of aborting.
+- For Telegram delivery, prefer short chat summary plus HTML attachment; include a `.zip` fallback when the HTML contains local assets or if `.html` delivery is unreliable.
